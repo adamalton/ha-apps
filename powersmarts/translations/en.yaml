@@ -1,0 +1,4 @@
+configuration:
+  log_level:
+    name: Log level
+    description: How much detail Powersmarts writes to the Home Assistant App log.

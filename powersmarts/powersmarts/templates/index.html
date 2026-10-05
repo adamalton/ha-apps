@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Powersmarts</h1>
+  <h2>Device automations</h2>
+  <div class="toolbar">
+    <a class="button" href="{{ app_url(request, '/automations/new') }}">Add device automation</a>
+  </div>
+  {% if automations %}
+    {% for automation in automations %}
+      <section class="card">
+        <h3>{{ automation.name }}{% if not automation.enabled %} (disabled){% endif %}</h3>
+        <p class="meta">{{ automation.poll_url }}</p>
+        <p class="meta">Every {{ automation.poll_interval_seconds }} seconds</p>
+        <p class="targets">
+          Targets:<br>
+          {% for entity_id in automation.target_entities %}
+            {{ entity_id }}{% if not loop.last %}<br>{% endif %}
+          {% endfor %}
+        </p>
+        <div class="actions">
+          <a class="button secondary" href="{{ app_url(request, '/automations/' ~ automation.id ~ '/edit') }}">Edit</a>
+          <form method="post" action="{{ app_url(request, '/automations/' ~ automation.id ~ '/delete') }}" onsubmit="return confirm('Delete this device automation?');">
+            <button class="button danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </section>
+    {% endfor %}
+  {% else %}
+    <p class="empty">No device automations yet.</p>
+  {% endif %}
+{% endblock %}

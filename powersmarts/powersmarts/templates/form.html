@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{% if automation %}Edit device automation{% else %}Add device automation{% endif %} · Powersmarts{% endblock %}
+{% block content %}
+  <p class="back"><a href="{{ app_url(request, '/') }}">Back to device automations</a></p>
+  <h1>{% if automation %}Edit device automation{% else %}Add device automation{% endif %}</h1>
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+  {% if entity_error %}
+    <p class="error">Could not load Home Assistant entities: {{ entity_error }}</p>
+  {% endif %}
+  <form method="post" class="card">
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" required value="{{ form.name if form else (automation.name if automation else '') }}">
+
+    <label for="poll_url">Poll URL</label>
+    <input id="poll_url" name="poll_url" type="url" required placeholder="https://" value="{{ form.poll_url if form else (automation.poll_url if automation else '') }}">
+
+    <label for="poll_interval_seconds">Poll interval (seconds)</label>
+    <input id="poll_interval_seconds" name="poll_interval_seconds" type="number" min="1" required value="{{ form.poll_interval_seconds if form else (automation.poll_interval_seconds if automation else 5) }}">
+
+    <label class="checkbox">
+      <input type="checkbox" name="enabled" value="1" {% if form %}{% if form.enabled %}checked{% endif %}{% elif automation is none or automation.enabled %}checked{% endif %}>
+      Enabled
+    </label>
+
+    <label for="target_entities">Target entities</label>
+    <p class="hint">Hold Command or Control to select more than one switch. Each line shows the Home Assistant friendly name and entity ID.</p>
+    <select id="target_entities" name="target_entities" multiple required>
+      {% for entity in switches %}
+        <option value="{{ entity.entity_id }}" {% if entity.entity_id in selected %}selected{% endif %}>
+          {{ entity.friendly_name }} ({{ entity.entity_id }})
+        </option>
+      {% endfor %}
+    </select>
+    {% if not switches and not entity_error %}
+      <p class="hint">No switch entities were found in Home Assistant.</p>
+    {% endif %}
+
+    <div class="actions">
+      <button class="button" type="submit">Save</button>
+      <a class="button secondary" href="{{ app_url(request, '/') }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}
